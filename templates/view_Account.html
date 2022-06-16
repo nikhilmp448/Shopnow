@@ -1,0 +1,171 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg0 p-t-75 p-b-85 mt-5 ">
+    <div class="container-fluid	 ">
+      <div class="d-flex ml-3 align-items-center">
+        <h1>Hi</h1>
+        <h3 class="ml-2">{{request.user}}</h3>
+      </div>
+        
+        <div class="row">
+        <div class="col-md-4 mt-2 ">
+            {% if addresses  %}
+            <div class="container">
+                <div class="row" style="font-size: 16px;">
+                    {% for address in addresses %}
+                    
+                    <div class="col-12 ">
+                      <div class="p-2 mt-3 mb-4">
+                        <a href="{% url 'edit_address' address.id %}">Edit</a>
+                        </div>
+                    </div>
+                    {% if address.default %}
+                    <h6 >Your permenent address :</h6>
+                    
+                    
+                        <h6 class="card-title">{{address.full_name}}</h6>
+                        
+                        <h6 class="card-subtitle mb-2 text-muted">{{address.address}} ,</h6>
+                        <p class="card-text">{{address.city}} , {{address.pin_code}} , {{address.state}} ,{{address.country}} , {{address.landmark}} </p>
+                        <a href="#" class="card-link">{{address.mobile}}</a>
+                        {% endif %}
+                        {% endfor %} 
+                    </div>
+
+                    </div>
+                   
+                                                  
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="false" aria-controls="collapseTwo">
+                    Add Address
+                </button>
+            </div>
+            {% endif %}
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                <form method="POST" action="{% url 'add_address' %}">
+                    {% csrf_token %}
+                    <article class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Address <input type="submit" value="Submit"
+                                    class="btn btn-success " style="float: right;" name="" id=""></h4>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label>Full Name</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name='full_name' />
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label>Mobile</label>
+                                    <input name='mobile' type="text" placeholder="" class="form-control" />
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Address</label>
+                                    <textarea type="text" placeholder="Type here" class="form-control" name='address'></textarea>
+                                </div>
+                               
+                                <div class="form-group col-sm-6">
+                                    <label>City*</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name='city' />
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Postal code</label>
+                                    <input name='pin_code' type="text" placeholder="" class="form-control" />
+
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label>State*</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name='state' />
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label>Country*</label>
+                                    <select name="country" class="form-control">
+                                        <option value="India">India</option>
+                                        <option value="United States">United States</option>
+                                        <option value="France">Germany</option>
+                                        <option value="Italy">Russia</option>
+                                        <option value="Italy">United Kingdom</option>
+                                    </select>
+                                </div>
+                                
+
+
+                                <div class="form-group col-sm-12">
+                                    <label>Landmark</label>
+                                    <input name='landmark' type="text" placeholder="" class="form-control" />
+                                </div>
+
+
+
+                            </div>
+
+
+                        </div>
+
+                    </article>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-8 mt-2 shadow p-2">
+            <table class="table align-middle mb-0 bg-white">
+                <thead class="bg-light">
+                  <tr>
+                    <th>Order-date</th>
+                    <th>Trackin no</th>
+                    <th>Total price</th>
+                    <th>status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for item in orders %}
+                  <tr >
+                    <td>
+                      <div class="d-flex align-items-center">
+                    
+                        <div class="ms-3">
+                          <p class="fw-bold mb-1">{{item.created_at}}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p class="fw-normal mb-1">{{item.tracking_no}}</p>
+                      
+                    </td>
+                    <td>{{item.total_price}}</td>
+                    <td>
+                      {% if item.status == 'delivered' %}
+                      <span class="badge badge-success rounded-pill d-inline">delivered</span>
+                      {% elif item.status == 'packed' %}
+                      <span class="badge badge-primary rounded-pill d-inline">packed</span>
+                      {% elif item.status == 'shipped' %}
+                      <span class="badge badge-primary rounded-pill d-inline">shipped</span>
+                      {% elif item.status == 'pending' %}
+                      <span class="badge badge-warning rounded-pill d-inline">pending</span>
+                      {% else %}
+                      <span class="badge badge-danger rounded-pill d-inline">canceled</span>
+                      {% endif %}
+                    </td>
+                    
+                    <td>
+                      <a href="{% url 'myorder' item.tracking_no %}" class="btn btn  d-inline">
+                        VIEW
+                      </a>
+                    </td>
+                  </tr>
+                 {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}

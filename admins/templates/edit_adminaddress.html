@@ -1,0 +1,52 @@
+{% extends 'admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bg0 p-t-75 p-b-85 mt-5 ">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <form method="POST"  class="card-body"style="font-size: 16px;">
+            {% csrf_token %}
+            <p class="text-uppercase text-sm">edit address</p>
+            
+            <div class="row">
+              <div class="col-md-6 col-md-4 col-md-12">
+                {% for field in form.visible_fields %}
+                <div class="form-group">
+                  <label for="example-text-input" class="form-control-label"></label>
+                  {{field.label_tag}}
+                  {{field}}
+                </div>
+                {% endfor %}
+                </div>
+              </div>
+            
+            <button type="button" class="btn btn-primary btn-sm ms-auto " data-bs-toggle="modal" data-bs-target="#staticBackdrop">edit</button>
+             <!-- Modal -->
+             <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <h4 class="text-danger">Are you sure to update the address </h4> 
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Understood</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+    </div>
+
+
+{% endblock %}
