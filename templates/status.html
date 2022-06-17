@@ -1,0 +1,21 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+<div class="cart-table-area section-padding-100 pt-5">
+    <div class="container-fluid">
+        
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center align-items-center pt-5">
+                <div class="d-flex flex-column aling-items-center text-success" style="gap: 20px;">
+                    <i class="fa-solid fa-circle-check" style="font-size: 60px; align-self: center;"></i>
+                    <p class="mb-0 text-success" style="font-size: 32px; align-self: center">Thank you, Your Payment is successful</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <div class="d-flex flex-column aling-items-center justify-content-center d-inline" style="display: inline-block !important;">
+                    <a class="btn btn-success" href="{% url 'home' %}">return to home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

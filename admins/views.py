@@ -6,17 +6,21 @@ from admins.forms import AddProductForm
 from shopapp.models import Account, Address
 from products.models import Myorder, Order, Product
 import pandas as pd
+from django.contrib.auth.decorators import login_required
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http.response import JsonResponse
-
+from django.views.decorators.cache import never_cache
 from shopapp.forms import AddressForm
 # Create your views here.
 
+
+@never_cache
 def admin_signin(request):
     if request.user.is_authenticated :
         return redirect("admin_home")
+        
 
     if request.method == "POST":
 
@@ -47,15 +51,19 @@ def admin_signout(request):
     messages.success(request, "You are logged out ! ")
     return redirect("admin_signin")
 
-
+@login_required(login_url='admin_signin')
 def admin_home(request):
     return render (request,'admindash.html')
 
+
+@login_required(login_url='admin_signin')
 def customer(request):
     users = Account.objects.all()
     context = {"user": users}
     return render(request, "customer.html", context)
 
+
+@login_required(login_url='admin_signin')
 def customer_pickoff(request, customer_id):
     customer = Account.objects.get(pk=customer_id)
     if customer.is_active:
@@ -67,6 +75,8 @@ def customer_pickoff(request, customer_id):
 
     return redirect("customer")
 
+
+@login_required(login_url='admin_signin')
 def add_product(request):
     if request.method == "POST":
         form = AddProductForm(request.POST,request.FILES)
@@ -82,7 +92,8 @@ def add_product(request):
         form = AddProductForm()
     return render(request,'add_Products.html',{'form':form})
 
- 
+
+@login_required(login_url='admin_signin') 
 def view_product(request):
 
     products = Product.objects.all()
@@ -90,6 +101,7 @@ def view_product(request):
     return render(request, "view_edit.html", context)
 
 
+@login_required(login_url='admin_signin')
 def edit_product(request, id) :
     product = Product.objects.get(id=id)
     if request.method == 'POST' :
@@ -102,6 +114,7 @@ def edit_product(request, id) :
     context = {'form' : form}
     return render(request, 'edit_product.html', context)
 
+@login_required(login_url='admin_signin')
 def delete_adminprod(request,id):
     
     adminprod =  Product.objects.get(id=id)
@@ -110,15 +123,20 @@ def delete_adminprod(request,id):
 
 
 
+@login_required(login_url='admin_signin')
 def order_details(request):
     order= Order.objects.all()
     context = {'order':order}
     return render(request,'billing.html',context)
 
+
+@login_required(login_url='admin_signin')
 def searchtracking(request):
     track = Order.objects.filter().values_list('tracking_no',flat=True)
     productlist = list(track)
     return JsonResponse(productlist , safe=False)
+
+
 
 def searchtrack(request):
     if request.method == 'POST':
@@ -151,6 +169,7 @@ def edit_shipping(request,tno):
    
     order.save()
     return redirect('order_details')
+
 
 def view_shipping(request,tno):
     order= Order.objects.filter(tracking_no=tno).first()

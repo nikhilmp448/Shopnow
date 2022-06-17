@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'products',
     'admins',
     'coupon',
+    'storages',
     
 ]
 
@@ -99,8 +100,8 @@ DATABASES = {
        'ENGINE': 'django.db.backends.postgresql',
        'NAME': 'shopnow',
        'USER': 'shopnow',
-       'PASSWORD': '1234',
-       'HOST': 'localhost',
+       'PASSWORD': 'nikhil2020',
+       'HOST': 'database-1.c2xegivoijob.us-east-1.rds.amazonaws.com',
        'PORT': '5432',
    }
 }
@@ -155,6 +156,7 @@ STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -168,4 +170,8 @@ TWILIO_SERVICE = 'VA025e2b12cacc22da015ffd55355787be'
 RAZOR_KEY_ID = 'rzp_test_8TECVJSTDo2Zan'
 RAZOR_KEY_SECRET = 'xbpXmJWtKeDDxlYigl989uj6'
 
-
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = False
+AWS_ACCESS_KEY_ID = 'AKIARGT4KQDBFQE2QEGT'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'shopnow-bucket'

@@ -12,9 +12,7 @@ from shopapp.otp import *
 from products.models import Myorder, Order, OrderItem, Product ,Category, Wishlist
 from django.core.paginator import Paginator
 from django.db.models import Q
-import razorpay
-from django.conf import settings
-from django.http import HttpResponseBadRequest
+
 
 
 # Create your views here.
@@ -329,7 +327,7 @@ def razorpay(request):
     })
 
 def orderdisplay(request):
-    return HttpResponse("My order page")
+    return render(request,'status.html')
 
 def cancel_shipping(request,tno):
     order = Order.objects.get(tracking_no = tno)
