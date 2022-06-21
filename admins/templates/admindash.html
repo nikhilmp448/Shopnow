@@ -14,9 +14,9 @@
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Revenue</p>
                     <h5 class="font-weight-bolder">
-                      {{total_rev}}
+                      ₹{{total_revenue2}}
                     </h5>
-                    
+
                   </div>
                 </div>
                 <div class="col-4 text-end">
@@ -86,10 +86,10 @@
                       <span class="text-danger text-sm font-weight-bolder">{{c1}}</span>
                       canceled
                     </p>
-                    <p class="mb-0">
+                    <!-- <p class="mb-0">
                       <span class="text-success text-sm font-weight-bolder">{{order_count}}</span>
                       completed
-                    </p>
+                    </p> -->
                   </div>
                 </div>
                 <div class="col-4 text-end">
@@ -107,54 +107,31 @@
         <div class="col-lg-12 mb-lg-0 mb-4">
           <div class="card z-index-2 h-100">
             <div class="card-header pb-0 pt-3 bg-transparent">
-              <h6 class="text-capitalize">Sales overview</h6>
-              <p class="text-sm mb-0">
-                <i class="fa fa-arrow-up text-success"></i>
-                <span class="font-weight-bold">4% more</span> in 2021
-              </p>
+              <h6 class="text-capitalize">Overview</h6>
             </div>
-            <div class="card-body p-3">
-              <div class="char">
+            <div class="card-body p-3 d-flex">
+              <!-- <div class="char">
                 <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+              </div> -->
+              <div class="" id="container" style="width:300px;">
+                <canvas id="myChart"></canvas>
+                <strong>Customers : {{total_user}}</strong>
               </div>
+              <div class="" id="container" style="width:300px;">
+                <canvas id="myChart2"></canvas>
+                <strong>Revenue </strong>
+              </div>
+              <!-- <div class="" id="container" style="width:300px;">
+                <canvas id="myChart3"></canvas>
+                <strong>Product Sale </strong>
+              </div> -->
             </div>
           </div>
         </div>
         
       </div>
 
-      <footer class="footer pt-3  ">
-        <div class="container-fluid">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-              <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class="fa fa-heart"></i> by
-                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                for a better web.
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   </main>
   <div class="fixed-plugin">
@@ -231,5 +208,102 @@
   </div>
  
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script> var c_config = {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: {{ data1|safe }},
+      backgroundColor: [
+      'rgb(153, 153, 255)',
+      'rgb(255, 51, 0)',
+      ],
+      // borderColor: [
+      //       'rgba(255, 99, 132, 1)',
+      //       'rgba(54, 162, 235, 1)',
+      //       'rgba(255, 206, 86, 1)',
+      //       'rgba(75, 192, 192, 1)',
+      //       'rgba(153, 102, 255, 1)',
+      //       'rgba(255, 159, 64, 1)'
+      //   ],
+        borderWidth: 1 ,
+      label: 'Customer'
+    }],
+    labels: {{ data1_label|safe }}
+  },
+  options: {
+    responsive: true
+  }
+};
+
+var o_config = {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: {{ data2|safe }},
+        backgroundColor: [
+        'rgb(255, 51, 0)',
+        'rgb(77, 255, 77)',
+        'rgba(255, 159, 64, 1)',
+        ],
+        // borderColor: [
+        //       'rgba(255, 99, 132, 1)',
+        //       'rgba(54, 162, 235, 1)',
+        //       'rgba(255, 206, 86, 1)',
+        //       'rgba(75, 192, 192, 1)',
+        //       'rgba(153, 102, 255, 1)',
+        //       'rgba(255, 159, 64, 1)'
+        //   ],
+          borderWidth: 1 ,
+        label: 'revenue'
+      }],
+      labels: {{ data2_label|safe }}
+    },
+    options: {
+      responsive: true
+    }
+  };
+
+  // var l_config = {
+  //   type: 'bar',
+  //   data: {
+  //     datasets: [{
+  //       data: {{ data2|safe }},
+  //       backgroundColor: [
+  //       'rgb(255, 128, 255)',
+  //       'rgb(204, 0, 204)',
+  //       'rgb(128, 0, 128)',
+  //       ],
+  //       // borderColor: [
+  //       //       'rgba(255, 99, 132, 1)',
+  //       //       'rgba(54, 162, 235, 1)',
+  //       //       'rgba(255, 206, 86, 1)',
+  //       //       'rgba(75, 192, 192, 1)',
+  //       //       'rgba(153, 102, 255, 1)',
+  //       //       'rgba(255, 159, 64, 1)'
+  //       //   ],
+  //         borderWidth: 1 ,
+  //       label: 'revenue'
+  //     }],
+  //     labels: {{ data2_label|safe }}
+  //   },
+  //   options: {
+  //     responsive: true
+  //   }
+  // };
+
+window.onload = function() {
+    var c_ctx = document.getElementById('myChart').getContext('2d');
+    window.myPie1 = new Chart(c_ctx, c_config);
+
+    var o_ctx = document.getElementById('myChart2').getContext('2d');
+        window.myPie2 = new Chart(o_ctx, o_config);
+
+    // var l_ctx = document.getElementById('myChart3').getContext('2d');
+    // window.myPie2 = new Chart(l_ctx, l_config);
+    };
+
+</script>
  {% endblock %}
  

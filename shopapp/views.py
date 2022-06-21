@@ -4,12 +4,14 @@ from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+
+from coupon.models import Coupon, CouponUsers
 from .forms import RegistrationForm,AddressForm
 from .models import Account,Address
 from django.contrib import messages , auth
 from django.contrib.auth import authenticate, logout
 from shopapp.otp import *
-from products.models import Myorder, Order, OrderItem, Product ,Category, Wishlist
+from products.models import Myorder, Order, OrderItem, Product ,Category, Review, Wishlist
 from django.core.paginator import Paginator
 from django.db.models import Q
 
@@ -17,7 +19,7 @@ from django.db.models import Q
 
 # Create your views here.
 def home(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(status=1)
     catogory = Category.objects.all()
     context = {'products':products , 'catogory':catogory}
     return render(request,'index.html',context)
@@ -36,7 +38,7 @@ def store(request, category_slug=None) :
         product_count = products.count()
     else :
         products = Product.objects.all().filter(available=True).order_by('id')
-        paginator = Paginator(products, 1)
+        paginator = Paginator(products, 8)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         product_count = products.count()
@@ -105,8 +107,14 @@ def edit_address(request,id):
     return render(request, 'edit_address.html', context)
 
 def product_details(request,slug ):
+    review = Review.objects.filter(product__slug=slug)
+    rev_count=review.count()
     item =Product.objects.get(slug=slug)
-    context= {'item':item}
+    context= {
+        'item':item,
+        'review':review,
+        'rev_count':rev_count,
+        }
     return render(request,'product-detail.html',context)
 
 def search(request) :
@@ -231,14 +239,20 @@ def deletecart(request):
 @login_required(login_url='login')
 def checkout(request): 
     rawcart = OrderItem.objects.filter(user=request.user )
+    coupon=0
+    if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+        coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+        coupon = coupon_user.amount
+
     for item in rawcart:
         if item.product.available ==False:
             OrderItem.objects.delete(id=item.id)
     cartitem = OrderItem.objects.filter(user=request.user)
-    total_price = 0
+    total_prices = 0
     for item in cartitem:
-        total_price += item.quantity * item.product.price
-    return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price})
+        total_prices += item.quantity * item.product.price
+    total_price = total_prices - coupon
+    return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price,'coupon':coupon})
 
 
 
@@ -260,7 +274,10 @@ def placeorder(request):
         new_order.landmark = request.POST['landmark']
         new_order.payment_mode = request.POST['payment_mode']
         
-    
+        coupon=0
+        if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+            coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+            coupon = coupon_user.amount
 
 
         cart = OrderItem.objects.filter(user=request.user)
@@ -268,7 +285,7 @@ def placeorder(request):
         for item in cart:
             cart_total += item.quantity * item.product.price
 
-        new_order.total_price = cart_total
+        new_order.total_price = cart_total - coupon
         trackno = 'SNW'+str(random.randint(111111111,999999999))
         while Order.objects.filter(tracking_no=trackno) is None:
             trackno = 'SNW'+str(random.randint(111111111,999999999))
@@ -280,6 +297,9 @@ def placeorder(request):
             while Order.objects.filter(payment_id=oder_id) is None:
                 oder_id = 'COD'+str(random.randint(111111111,999999999))
             new_order.payment_id = oder_id
+            
+            coupon_user.is_used = True
+
         else:
             new_order.payment_id = request.POST['payment_id']
             new_order.is_paid = True
@@ -309,6 +329,7 @@ def placeorder(request):
         if (paymode == 'Razorpay' or paymode == 'PayPal' ):
             # new_order.payment_id = request.POST['payment_id']
             # new_order.save()
+            coupon_user.is_used = True
             return JsonResponse({'status': "Your order has been placed successfully" })
 
 
@@ -343,26 +364,34 @@ def cancel_shipping(request,tno):
 
 def loginpage(request):
     if request.user.is_authenticated:
-        return redirect('home')
-        
+           return redirect('home')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        try:
-            user = Account.objects.get(email=email)
-        except :
-            messages.error(request,"user Does not exist..")
-        if user.is_active:
-            user = authenticate(request,email=email,password=password)
-            if user is not None:
-                auth.login(request,user)
-                return redirect('home')
-            else:
-                messages.error(request,'user does not exist..')
+        
+        
+        if email == '' and password == '':
+            messages.error(request, "Please provide an email and password")
+        elif password == '':
+            messages.error(request, "Please provide password")
+        elif email == '':
+            messages.error(request, "Please provide an email")
         else:
-            messages.error(request,'You have been blocked by admin')
-            return redirect('login')
-
+            try:
+                user = Account.objects.get(email=email)
+            except:
+                messages.error(request, "user does not exist")
+                
+                
+        user = authenticate(request,email=email, password=password)
+        
+        
+        if user is not None:
+            auth.login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, "email or password does not match")
     return render(request,'login.html')
 
 def logoutuser(request):
@@ -431,5 +460,68 @@ def otp(request):
         
     return render(request,'otpverification.html')
 
+@login_required(login_url='login')
+def change_password(request) :
+    if request.method == 'POST' :
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+
+        user = Account.objects.get(email__exact = request.user.email)
+        
+        if new_password == confirm_password :
+            success = user.check_password(current_password)
+            if success :
+                user.set_password(new_password)
+                user.save()
+                
+                # logout(request) 
+                
+                messages.success(request, 'Password changed successfully')
+                return redirect('viewAccount')
+            else :
+                messages.error(request, 'Please enter correct Current Password')
+                return render('viewAccount')
+        else :
+            messages.error(request, 'New Password Does Not Match')
+            return redirect('viewAccount')
+        
+    
+    return render(request, 'reset-password.html')
 
 
+def review(request):
+    if request.method == 'GET':
+        user = request.user
+        prod_id = request.GET.get('prod_id')
+        product= Product.objects.get(slug=prod_id)
+        subject = request.GET.get('subject')
+        review = request.GET.get('review')
+        rating = request.GET.get('rating')
+        Review(user = user, product=product ,subject=subject ,review=review,rating=rating).save()
+        return redirect('product-details',slug=prod_id)
+
+
+def add_coupon(request):
+
+    print('check')
+    if request.method == 'POST':
+        code = request.POST['code']
+        print(code)
+
+        if Coupon.objects.filter(coupon_code = code, is_available = True).exists() and CouponUsers.objects.filter(user = request.user,coupon__coupon_code = code).exists() ==False:
+            coupon_object = Coupon.objects.get(coupon_code=code , is_available = True)
+            coupon_user = CouponUsers()
+            coupon_user.user = request.user
+            coupon_user.coupon = coupon_object
+            coupon_user.is_used = False
+            coupon_user.amount = coupon_object.amount
+            coupon_user.save()
+
+
+            coupon_object.quantity -=1
+            if coupon_object.quantity == 0:
+                coupon_object.is_available = False
+            coupon_object.save()
+
+    return redirect('checkout')

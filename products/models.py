@@ -4,6 +4,7 @@ from django.db import models
 from django.forms import DateTimeField
 from shopapp.models import Account, Address
 from django.urls import reverse
+from django.utils.text import slugify
 # Create your models here.
 
 
@@ -15,6 +16,10 @@ class Category(models.Model):
         ordering = ['name']
         verbose_name = 'category'
         verbose_name_plural = 'category'
+
+    def save(self, *args, **kwargs) :
+        self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -43,6 +48,10 @@ class Product(models.Model):
         ]
         verbose_name = 'item'
         verbose_name_plural = 'item'
+
+    def save(self, *args, **kwargs) :
+        self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -130,3 +139,6 @@ class Review(models.Model):
     review = models.TextField(null=True, blank=True)
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __int__(self):
+        return ( self.id)

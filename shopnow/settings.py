@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+
 import os
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6y30oi)iro+z108lisw0i14dp)(5h0j(sfnm@sis8d0!r6^q@+'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG =True
+# config('DEBUG',cast=bool)
 ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
     'admins',
     'coupon',
     'storages',
+    'notfound',
     
 ]
 
@@ -97,12 +101,12 @@ AUTH_USER_MODEL =   'shopapp.Account'
 
 DATABASES = {
    'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'shopnow',
-       'USER': 'shopnow',
-       'PASSWORD': 'nikhil2020',
-       'HOST': 'database-1.c2xegivoijob.us-east-1.rds.amazonaws.com',
-       'PORT': '5432',
+       'ENGINE':config('ENGINE'),
+       'NAME': config('NAME'),
+       'USER': config('USER'),
+       'PASSWORD':config('PASSWORD'),
+       'HOST': config('HOST'),
+       'PORT': config('POST'),
    }
 }
 
@@ -161,17 +165,17 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-TWILIO_ACCOUNT_SID = 'AC543c3b3b75793125803248d128347b3c'
-TWILIO_AUTH_TOKEN = '3ff9bc196234f5f78fe1c4b12159c309'
-TWILIO_SERVICE = 'VA025e2b12cacc22da015ffd55355787be'
+TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
+TWILIO_SERVICE = config('TWILIO_SERVICE')
 
 
 
-RAZOR_KEY_ID = 'rzp_test_8TECVJSTDo2Zan'
-RAZOR_KEY_SECRET = 'xbpXmJWtKeDDxlYigl989uj6'
+RAZOR_KEY_ID = config('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH = False
-AWS_ACCESS_KEY_ID = 'AKIARGT4KQDBFQE2QEGT'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'shopnow-bucket'
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')

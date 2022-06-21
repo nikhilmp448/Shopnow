@@ -5,7 +5,6 @@ from django.contrib import messages, auth
 from admins.forms import AddProductForm
 from shopapp.models import Account, Address
 from products.models import Myorder, Order, Product
-import pandas as pd
 from django.contrib.auth.decorators import login_required
 import os
 from django.conf import settings
@@ -36,7 +35,7 @@ def admin_signin(request):
 
         if user is not None:
             auth.login(request, user)
-            messages.success(request, "Login Successful")
+            messages.success(request,"Login Successfull")
             return redirect("admin_home")
         else:
             messages.error(request, "Invalid credentials")
@@ -53,7 +52,37 @@ def admin_signout(request):
 
 @login_required(login_url='admin_signin')
 def admin_home(request):
-    return render (request,'admindash.html')
+    #user chart
+    active_user = Account.objects.filter(is_active=True)
+    blocked_user =Account.objects.filter(is_active=False)
+    total_user = int(active_user.count()+blocked_user.count())
+    data1=[active_user.count(),blocked_user.count()]
+    data1_label =['non blocked','blocked']
+
+    #revenue chart
+    total_revenue = 0
+    total_revenue2 = 0
+
+    rev = Order.objects.filter(status = 'cancel')
+    rev2 = Order.objects.exclude(status = 'cancel')
+    for item in rev:
+        total_revenue+=item.total_price
+    for item in rev2:
+        total_revenue2+=item.total_price
+    data2 = [total_revenue,total_revenue2]
+    data2_label = ['loss','profit']
+
+    # prod_price = 
+
+    context = {
+        'total_user':total_user,
+        'data1':data1,
+        'data1_label':data1_label,
+        'data2':data2,
+        'data2_label':data2_label,
+        'total_revenue2':total_revenue2,
+    }
+    return render (request,'admindash.html',context)
 
 
 @login_required(login_url='admin_signin')
@@ -122,10 +151,9 @@ def delete_adminprod(request,id):
     return redirect('view_product')
 
 
-
 @login_required(login_url='admin_signin')
 def order_details(request):
-    order= Order.objects.all()
+    order= Order.objects.all().order_by('-created_at')
     context = {'order':order}
     return render(request,'billing.html',context)
 
@@ -211,7 +239,7 @@ def add_adminaddress(request):
             default = True,
             
             )
-        return redirect('viewAccount')
+        return redirect('viewadminacc')
 
 def edit_adminaddress(request,id):
     address = Address.objects.get(id=id)

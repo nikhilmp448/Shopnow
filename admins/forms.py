@@ -15,7 +15,7 @@ class AddProductForm(ModelForm):
             "image2",
             "description",
             "price",
-            "available",
+            "status",
             "stock",
         )
     def __init__(self,*args,**kwargs):
