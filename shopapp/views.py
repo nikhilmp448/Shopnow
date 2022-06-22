@@ -243,7 +243,8 @@ def checkout(request):
     if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
         coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
         coupon = coupon_user.amount
-
+        coupon_name = coupon_user.coupon.coupon_code
+        print(coupon_name)
     for item in rawcart:
         if item.product.available ==False:
             OrderItem.objects.delete(id=item.id)
@@ -252,7 +253,7 @@ def checkout(request):
     for item in cartitem:
         total_prices += item.quantity * item.product.price
     total_price = total_prices - coupon
-    return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price,'coupon':coupon})
+    return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price,'coupon':coupon,'coupon_name':coupon_name,'coupon_user':coupon_user})
 
 
 
@@ -338,10 +339,13 @@ def placeorder(request):
 
 @csrf_exempt
 def razorpay(request):
+    if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+            coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+            coupon = coupon_user.amount
     cart = OrderItem.objects.filter(user=request.user)
     total_price = 0
     for item in cart:
-        total_price += item.product.price * item.quantity
+        total_price += (item.product.price * item.quantity)-coupon
     
     return JsonResponse({
         'total_price':total_price

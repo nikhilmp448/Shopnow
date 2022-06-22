@@ -38,7 +38,7 @@ def total_order_count(request):
     return dict(order_count=order_count,c1=c1,c2=c2)
 
 def total_user(request):
-    user_count = Account.objects.all()
+    user_count = Account.objects.filter(is_superadmin=False)
     u_count =user_count.count()
     return dict(u_count=u_count)
 
