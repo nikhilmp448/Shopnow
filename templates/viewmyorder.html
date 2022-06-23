@@ -58,7 +58,7 @@
                         {% if order.status != 'delivered' and order.status != 'cancel' %}
                         <a class="btn btn-danger" href="{% url 'cancel_shipping' order.tracking_no %}"> cancel now</a>
                         {% endif %}
-                        {% if order.status == 'cancel %}
+                        {% if order.status == 'cancel' %}
                         <p class="btn btn-warning"> canceled</p>
                         {% endif %}
                         {% if order.status == 'delivered' %}

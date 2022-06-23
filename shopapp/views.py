@@ -256,9 +256,6 @@ def checkout(request):
     return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price,'coupon':coupon,'coupon_name':coupon_name,'coupon_user':coupon_user})
 
 
-
-
-
 @csrf_exempt
 @login_required(login_url='login')
 def placeorder(request):
