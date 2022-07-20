@@ -1,15 +1,15 @@
-
+from django.conf import settings
 from twilio.rest import Client
 
 def sendOTP(mobile):
     
     number = '+91'+ str(mobile)
-    account_sid = 'AC543c3b3b75793125803248d128347b3c'
-    auth_token = '3ff9bc196234f5f78fe1c4b12159c309'
+    account_sid = settings.TWILIO_ACCOUNT_SID
+    auth_token = settings.TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
 
     verification = client.verify \
-                     .services('VA025e2b12cacc22da015ffd55355787be') \
+                     .services(settings.TWILIO_SERVICE) \
                      .verifications \
                      .create(to= number, channel='sms')
 
@@ -18,12 +18,12 @@ def sendOTP(mobile):
 def verifyOTP(mobile,otp):
 
     number = '+91'+ str(mobile)
-    account_sid = 'AC543c3b3b75793125803248d128347b3c'
-    auth_token = '3ff9bc196234f5f78fe1c4b12159c309'
+    account_sid = settings.TWILIO_ACCOUNT_SID
+    auth_token = settings.TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
 
     verification_check = client.verify \
-                           .services('VA025e2b12cacc22da015ffd55355787be') \
+                           .services(settings.TWILIO_SERVICE) \
                            .verification_checks \
                            .create(to= number, code= otp)
 
