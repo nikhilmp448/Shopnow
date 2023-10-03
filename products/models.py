@@ -1,5 +1,4 @@
 from email.mime import image
-from typing import final
 from django.db import models
 from django.forms import DateTimeField
 from shopapp.models import Account, Address
