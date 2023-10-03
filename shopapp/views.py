@@ -240,19 +240,20 @@ def deletecart(request):
 def checkout(request): 
     rawcart = OrderItem.objects.filter(user=request.user )
     coupon=0
-    if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
-        coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
-        coupon = coupon_user.amount
-        coupon_name = coupon_user.coupon.coupon_code
-        print(coupon_name)
+    """ disabled coupon for dev purpose """
+    # if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+    #     coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+    #     coupon = coupon_user.amount
+    #     coupon_name = coupon_user.coupon.coupon_code
+    #     print(coupon_name)
     for item in rawcart:
         if item.product.available ==False:
             OrderItem.objects.delete(id=item.id)
     cartitem = OrderItem.objects.filter(user=request.user)
-    total_prices = 0
+    total_price = 0
     for item in cartitem:
-        total_prices += item.quantity * item.product.price
-    total_price = total_prices-coupon
+        total_price += item.quantity * item.product.price
+    # total_price = total_prices-coupon
     return render(request,'checkout.html',{'cartitem':cartitem,'total':total_price,'coupon':coupon})
 
 
@@ -272,14 +273,16 @@ def placeorder(request):
         new_order.landmark = request.POST['landmark']
         new_order.payment_mode = request.POST['payment_mode']
         
-        coupon=0
-        if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
-            coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
-            coupon = coupon_user.amount
+        # coupon=0
+        # if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+        #     coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+        #     coupon = coupon_user.amount
 
 
         cart = OrderItem.objects.filter(user=request.user)
-        cart_total = 0-coupon
+        # cart_total = 0-coupon
+        cart_total = 0
+
         for item in cart:
             cart_total += item.quantity * item.product.price
 
@@ -296,8 +299,8 @@ def placeorder(request):
                 oder_id = 'COD'+str(random.randint(111111111,999999999))
             new_order.payment_id = oder_id
             
-            coupon_user.is_used = True
-            coupon_user.save()
+            # coupon_user.is_used = True
+            # coupon_user.save()
 
         else:
             new_order.payment_id = request.POST['payment_id']
@@ -328,8 +331,8 @@ def placeorder(request):
         if (paymode == 'Razorpay' or paymode == 'PayPal' ):
             new_order.payment_id = request.POST['payment_id']
             new_order.save()
-            coupon_user.is_used = True
-            coupon_user.save()
+            # coupon_user.is_used = True
+            # coupon_user.save()
             return JsonResponse({'status': "Your order has been placed successfully" })
 
 
@@ -338,13 +341,14 @@ def placeorder(request):
 
 @csrf_exempt
 def razorpay(request):
-    if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
-            coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
-            coupon = coupon_user.amount
+    # if CouponUsers.objects.filter(user = request.user , is_used = False).exists():
+    #         coupon_user = CouponUsers.objects.get(user = request.user , is_used = False)
+    #         coupon = coupon_user.amount
     cart = OrderItem.objects.filter(user=request.user)
     total_price = 0
     for item in cart:
-        total_price += (item.product.price * item.quantity)-coupon
+        # total_price += (item.product.price * item.quantity)-coupon
+        total_price += (item.product.price * item.quantity)
     
     return JsonResponse({
         'total_price':total_price

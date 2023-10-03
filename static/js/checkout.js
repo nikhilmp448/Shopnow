@@ -32,7 +32,7 @@ $(document).ready(function () {
                 success: function (response) {
                     // console.log(response);
                     var options = {
-                        "key": "rzp_test_8TECVJSTDo2Zan", // Enter the Key ID generated from the Dashboard
+                        "key": "rzp_test_gI5wxfxo3on80w", // Enter the Key ID generated from the Dashboard
                         "amount": response.total_price * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         "currency": "INR",
                         "name": "ShopNow pvt.ltd",
