@@ -422,8 +422,21 @@ def register(request):
             request.session['mobile']     = mobile
             request.session['password']   = password
 
-            sendOTP(mobile)
-            return redirect('otp')
+            user = Account.objects.create_user(
+                first_name =  first_name,
+                last_name  =  last_name,
+                email      =  email,
+                gender     =  gender,
+                mobile     =  mobile,
+                password   =  password
+            )
+            user.is_verified = True
+            user.save()
+            return redirect('login')
+        """ OTP service temporarily closed due to twillio SMS limit crosed"""
+
+            # sendOTP(mobile)
+            # return redirect('otp')
 
     context = {'form' : form}
     return render(request,'register.html',context)
