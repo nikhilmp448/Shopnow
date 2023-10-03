@@ -19,7 +19,7 @@ from django.urls import path,include
 
 urlpatterns = [
     path('',include('shopapp.urls')),
-    # path('admin/', admin.site.urls),
-    path('admin/',include('admins.urls'))
+    path('admin/', admin.site.urls),
+    # path('admin/',include('admins.urls'))
 ]
 handler404 = 'notfound.views.error_404'
